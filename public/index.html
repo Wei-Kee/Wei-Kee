@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GigNest — find gigs matched to your skills</title>
+<meta name="description" content="Post and find local or remote gigs, matched to your skills, with built-in commission handling.">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%235b4ce0'/><path d='M50 25l25 15v20L50 75 25 60V40z' stroke='white' stroke-width='6' fill='none' stroke-linejoin='round'/></svg>">
+</head>
+<body>
+
+<div class="app">
+
+  <aside class="rail">
+    <div class="rail-brand">
+      <span class="rail-mark"><svg viewBox="0 0 24 24"><path d="M12 3l8 5v8l-8 5-8-5V8z"/></svg></span>
+      <div>
+        <div class="rail-name">GigNest</div>
+        <div class="rail-sub">Gigs matched to you</div>
+      </div>
+    </div>
+
+    <div class="rail-profile">
+      <div class="rail-profile-name" id="railName">You</div>
+      <div class="rail-profile-skills" id="railSkills">Loading…</div>
+    </div>
+
+    <nav class="rail-nav" id="nav">
+      <button class="nav-item is-active" data-view="browse">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        Browse gigs
+        <span class="nav-count" id="navOpenCount">0</span>
+      </button>
+      <button class="nav-item" data-view="post">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        Post a gig
+      </button>
+      <button class="nav-item" data-view="mygigs">
+        <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/></svg>
+        My posted gigs
+      </button>
+      <button class="nav-item" data-view="applications">
+        <svg viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        My applications
+        <span class="nav-count" id="navAppCount">0</span>
+      </button>
+      <button class="nav-item" data-view="earnings">
+        <svg viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        Earnings
+      </button>
+      <button class="nav-item" data-view="profile">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+        Profile
+      </button>
+    </nav>
+
+    <div class="rail-foot">
+      Demo data lives in <code>data/db.json</code>.<br>
+      <button type="button" id="resetBtn">Reset demo data</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <h1 id="viewTitle">Browse gigs</h1>
+        <p id="viewSubtitle">Sorted by how well they match your skills</p>
+      </div>
+    </header>
+
+    <!-- ============================ BROWSE ============================ -->
+    <section class="view" id="view-browse">
+      <div class="stat-row">
+        <div class="stat"><div class="stat-label">Open gigs available</div><div class="stat-value" id="statOpen">0</div></div>
+        <div class="stat"><div class="stat-label">Your pending applications</div><div class="stat-value" id="statPending">0</div></div>
+        <div class="stat"><div class="stat-label">Gigs you're working on</div><div class="stat-value" id="statAccepted">0</div></div>
+      </div>
+
+      <div class="search-row">
+        <div class="search-input-wrap">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input type="text" id="searchInput" placeholder="Search by title, skill, or location">
+        </div>
+        <select id="categoryFilter">
+          <option value="">All categories</option>
+          <option value="design">Design</option>
+          <option value="writing">Writing</option>
+          <option value="tutoring">Tutoring</option>
+          <option value="delivery_errands">Delivery / errands</option>
+          <option value="tech_support">Tech support</option>
+          <option value="events_help">Events help</option>
+          <option value="other">Other</option>
+        </select>
+        <label class="checkbox-row filter-chip">
+          <input type="checkbox" id="remoteFilter">
+          Remote only
+        </label>
+      </div>
+
+      <div class="gig-grid" id="browseGrid">
+        <div class="empty">Loading…</div>
+      </div>
+    </section>
+
+    <!-- ============================ POST A GIG ============================ -->
+    <section class="view" id="view-post" hidden>
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Post a gig</h2>
+            <p>GigNest keeps 12% only when the gig is completed and paid — nothing upfront.</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <form class="form-grid" id="gigForm" novalidate>
+            <div class="form-errors" id="gigErrors" hidden></div>
+
+            <div class="field field-wide">
+              <label for="gTitle">Gig title</label>
+              <input type="text" id="gTitle" placeholder="Logo for a new bubble tea stall" required>
+            </div>
+
+            <div class="field field-wide">
+              <label for="gDesc">Description</label>
+              <textarea id="gDesc" placeholder="What needs to be done, and any details a worker should know"></textarea>
+            </div>
+
+            <div class="field">
+              <label for="gCategory">Category</label>
+              <select id="gCategory" required>
+                <option value="">Choose one</option>
+                <option value="design">Design</option>
+                <option value="writing">Writing</option>
+                <option value="tutoring">Tutoring</option>
+                <option value="delivery_errands">Delivery / errands</option>
+                <option value="tech_support">Tech support</option>
+                <option value="events_help">Events help</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="gBudget">Budget <span class="field-hint">in RM</span></label>
+              <input type="number" id="gBudget" min="1" step="10" placeholder="150" required>
+            </div>
+
+            <div class="field field-wide">
+              <label for="gSkills">Skills needed <span class="field-hint">comma separated</span></label>
+              <input type="text" id="gSkills" placeholder="logo design, illustrator, branding">
+            </div>
+
+            <div class="field">
+              <label class="checkbox-row"><input type="checkbox" id="gRemote" checked> This gig can be done remotely</label>
+            </div>
+
+            <div class="field" id="gLocationField" hidden>
+              <label for="gLocation">Location</label>
+              <input type="text" id="gLocation" placeholder="Subang Jaya">
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Post gig</button>
+              <button type="reset" class="btn btn-quiet">Clear form</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ MY GIGS ============================ -->
+    <section class="view" id="view-mygigs" hidden>
+      <div id="myGigsList">
+        <div class="empty">Loading…</div>
+      </div>
+    </section>
+
+    <!-- ============================ MY APPLICATIONS ============================ -->
+    <section class="view" id="view-applications" hidden>
+      <div class="panel">
+        <div class="panel-head"><div><h2>Gigs you've applied to</h2></div></div>
+        <div class="panel-body" id="myApplicationsList">
+          <div class="empty">Loading…</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ EARNINGS ============================ -->
+    <section class="view" id="view-earnings" hidden>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-label">Total earned</div><div class="stat-value is-money" id="earnTotal">RM 0</div></div>
+        <div class="stat"><div class="stat-label">Total paid out to others</div><div class="stat-value" id="earnPaid">RM 0</div></div>
+        <div class="stat"><div class="stat-label">Commission collected by GigNest</div><div class="stat-value" id="earnCommission">RM 0</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div><h2>Transaction history</h2><p>Every completed gig and its commission split</p></div></div>
+        <div class="table-wrap" id="txTable">
+          <div class="empty">Loading…</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ PROFILE ============================ -->
+    <section class="view" id="view-profile" hidden>
+      <div class="panel" style="max-width:560px">
+        <div class="panel-head"><div><h2>Your profile</h2><p>Your listed skills power the match score on every gig</p></div></div>
+        <div class="panel-body">
+          <form class="form-grid" id="profileForm" novalidate>
+            <div class="form-errors" id="profileErrors" hidden></div>
+            <div class="field field-wide">
+              <label for="pName">Display name</label>
+              <input type="text" id="pName" required>
+            </div>
+            <div class="field field-wide">
+              <label for="pBio">Short bio</label>
+              <textarea id="pBio"></textarea>
+            </div>
+            <div class="field field-wide">
+              <label for="pSkills">Your skills <span class="field-hint">comma separated</span></label>
+              <input type="text" id="pSkills" placeholder="canva, copywriting, tutoring">
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Save profile</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="toast" id="toast" hidden role="status" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "name": "gignest",
+  "version": "1.0.0",
+  "description": "Find and post local or remote gigs, matched to your skills, with commission-based payment logic.",
+  "main": "server.js",
+  "scripts": { "start": "node server.js", "dev": "node --watch server.js" },
+  "engines": { "node": ">=18" },
+  "license": "MIT",
+  "private": true
+}
