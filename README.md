@@ -14,6 +14,7 @@ Exploring practical software projects, AI-assisted workflows, and B2B referral p
 | --- | --- | --- |
 | [Malaysia B2B Lead Generation](skills/malaysia-b2b-lead-generation) | Company research, contact verification, prospect qualification and partnership follow-up | Personal Codex skill; every email requires approval |
 | [GigNest](docs/gignest.md) | Local and remote gig marketplace concept with skill matching | Prototype; payments are simulated |
+| WS AI | AI learning companion for university students, combining note organization, study planning, schedule conflict detection and focus sessions | Hackathon demo; repository link will be added once published |
 
 ## How I work
 
